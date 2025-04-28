@@ -7,7 +7,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 date_default_timezone_set('Asia/Manila'); // Or your correct timezone
-
+echo 'hello';
 
 class Api{
     # @var object $db_connection The database connection
@@ -109,6 +109,7 @@ class Api{
     //     }
     // }
 
+  
 
     public function authenticate($username, $password) {
         if ($this->databaseConnection()) {
