@@ -10985,21 +10985,68 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
     }
 
     #Add activity notes
-    else if ($transaction == "submit add activity") {
-        $username = $_POST['username'];
-        $client_name = $_POST['client_name'];
-        $client_num = $_POST['client_num'];
-        $act_type = $_POST['act_type'];
-        $act_desc = $_POST['act_desc'];
-        $long = $_POST['long'];
-        $lat = $_POST['lat'];
-        $act_date =$_POST['act_date'];
-        $start_time = $_POST['starttime'];
-        $end_time = $_POST['endtime'];
-        $res = $api->insert_activity_note($username, $client_name, $client_num, $act_date, $start_time,  $end_time, $act_type, $act_desc, $long, $lat);
+    // else if ($transaction == "submit add activity") {
+    //     $username = $_POST['username'];
+    //     $client_name = $_POST['client_name'];
+    //     $client_num = $_POST['client_num'];
+    //     $act_type = $_POST['act_type'];
+    //     $act_desc = $_POST['act_desc'];
+    //     $long = $_POST['long'];
+    //     $lat = $_POST['lat'];
+    //     $act_date =$_POST['act_date'];
+    //     $start_time = $_POST['starttime'];
+    //     $end_time = $_POST['endtime'];
+    //     $res = $api->insert_activity_note($username, $client_name, $client_num, $act_date, $start_time,  $end_time, $act_type, $act_desc, $long, $lat);
  
-        echo json_encode($res);
+    //     echo json_encode($res);
+    // }
+
+    else if ($transaction == "submit add activity") {
+        if (isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['act_type']) 
+        && !empty($_POST['act_type']) && isset($_POST['activitydate'])
+        && !empty($_POST['activitydate']) && isset($_POST['starttime']) && !empty($_POST['starttime']) 
+        && isset($_POST['endtime']) && !empty($_POST['endtime'])) {
+            $error = '';
+            $username = $_POST['username'];
+            $act_type = $_POST['act_type'];
+            $activitydate = $api->check_date('empty', $_POST['activitydate'], '', 'Y-m-d', '', '', '');
+            $start_time = $_POST['starttime'];
+            $end_time = $_POST['endtime'];
+    
+            $employee_profile_details = $api->get_data_details_one_parameter('employee profile', $username);
+            $employee_id = $employee_profile_details[0]['EMPLOYEE_ID'];
+            $employee_department = $employee_profile_details[0]['DEPARTMENT'];
+    
+            // Check if actid is set for update operation
+            if (isset($_POST['actid']) && !empty($_POST['actid'])) {
+                $actid = $_POST['actid'];
+                $check_data_exist_one_parameter = $api->check_data_exist_one_parameter('activity note', $actid);
+    
+                if ($check_data_exist_one_parameter > 0) {
+                    $update_activity = $api->update_activity($act_type, $activitydate, $start_time, $end_time, $actid, $username);
+    
+                    if ($update_activity == '1') {
+                        echo json_encode(['status' => 'Updated']);
+                    } else {
+                        echo json_encode(['status' => 'error', 'message' => $update_activity]);
+                    }
+                    exit;
+                }
+            }
+            
+            // Insert new activity
+            $insert_activity = $api->insert_activity($employee_id, $employee_department, $act_type, $activitydate, $start_time, $end_time, $username);
+    
+            if ($insert_activity == '1') {
+                echo json_encode(['status' => 'Inserted']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => $insert_activity]);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
+        }
     }
+    
     #Get activity details
     else if ($transaction == "get activity details") {
 

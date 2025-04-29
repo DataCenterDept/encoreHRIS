@@ -21866,44 +21866,71 @@ public function update_pr($prno,$remarks, $requested_by,$bud_con,$bud_con_rem, $
             # Returns    : String
             #
             # -------------------------------------------------------------
-                 public function insert_activity_note($username,$client_name,$phone=null, $act_date, $start_time, $end_time, $act_type,$act_desc,$long,$lat){
-
-                $user_dept_code = $this->get_data_details_one_parameter("employee profile",$username)[0]['DEPARTMENT'];
-
-                if($this->databaseConnection()){
-                    $date_time =  date('Y-m-d H:i:s');
-                    $sql = $this->db_connection->prepare('INSERT INTO tblactivitynotes (ACTIVITY_DATE, USERNAME, USER_DEPT, CLIENT_NAME, CLIENT_TEL, ACT_DATE, START_TIME, END_TIME,  NOTE_TYPE, NOTE_DESC, GEO_LONG, GEO_LAT, CREATED_AT) 
-                    VALUES (:activity_date,:username,:user_dept_code,:client_name,:phone, :act_date, :start_time, :end_time, :act_type,:act_desc,:long,:lat,:created_at)');
-
-                    // $sql = $this->db_connection->prepare('INSERT INTO tblactivitynotes (ACTIVITY_DATE, USERNAME, USER_DEPT, CLIENT_NAME, CLIENT_TEL, ACT_DATE, START_TIME, END_TIME, NOTE_TYPE, NOTE_DESC, GEO_LONG, GEO_LAT, CREATED_AT) 
-                    // VALUES (:activity_date,:username,:user_dept_code,:client_name,:phone, :act_date, :start_time, :end_time, :act_type,:act_desc,:long,:lat,:created_at)');
-                     $sql->bindParam(':activity_date', $date_time);
-                     $sql->bindParam(':username', $username);
-                     $sql->bindParam(':user_dept_code',$user_dept_code);
-                     $sql->bindParam(':client_name',$client_name);
-                     $sql->bindParam(':phone',$phone);
-                     $sql->bindParam(':act_date',$act_date);
-                     $sql->bindParam(':start_time',$start_time);
-                     $sql->bindParam(':end_time',$end_time);
-
-                     $sql->bindParam(':act_type',$act_type);
-                     $sql->bindParam(':act_desc',$act_desc);
-                     $sql->bindParam(':long',$long);
-                     $sql->bindParam(':lat',$lat);
-                     $sql->bindParam(':created_at',$date_time);
-                     
-                    if ($sql->execute()) {
-                        $this->insert_logs($username, 'insert_activity_note', '');
-                       return 'Added';
-
-                    }  else{
-                        
-                        return $sql->errorInfo();
+            public function insert_activity($employee_id, $employee_department, $act_type, $activitydate, $start_time, $end_time, $username) {
+                if ($this->databaseConnection()) {
+                    $error = '';
+                    $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+                    # Get system parameter id
+                    $system_parameter = $this->get_system_parameter('43', 1);
+                    $paramnum = $system_parameter[0]['PARAMNUM'];
+                    $id = $system_parameter[0]['ID'];
+            
+                    // Correct parameter binding to match table structure
+                    $sql = $this->db_connection->prepare("INSERT INTO tblactivitynotes (ACT_ID, USERNAME, USER_DEPT, NOTED_BY, ACT_DATE, START_TIME, END_TIME, STATUS) 
+                    VALUES (:id, :username, :user_dept, :noted_by, :act_date, :start_time, :end_time, '0')");
+                    
+                    $sql->bindParam(':id', $id);
+                    $sql->bindParam(':username', $employee_id);
+                    $sql->bindParam(':user_dept', $employee_department);
+                    $sql->bindParam(':noted_by', $act_type);
+                    $sql->bindParam(':act_date', $activitydate);
+                    $sql->bindParam(':start_time', $start_time);
+                    $sql->bindParam(':end_time', $end_time);
+                   
+                    if($sql->execute()){
+                        # Update system parameter value
+                        $update_system_parameter_value = $this->update_system_parameter_value($paramnum, '43', $username);
+                        return '1'; // Add explicit success return value
                     }
-    
+                    else{
+                        return $sql->errorInfo()[2]; // Return error message
+                    }
                 }
-
+                return 'Database connection error'; // Handle connection failure
             }
+            
+
+
+        public function insert_activity_note($employee_id, $employee_department, $act_type, $activitydate,  $start_time, $end_time, $username){
+        if ($this->databaseConnection()) {
+            $error = '';
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter('43', 1);
+            $paramnum = $system_parameter[0]['PARAMNUM'];
+            $id = $system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare("INSERT INTO tblactivitynotes (ACT_ID, USERNAME, USER_DEPT, NOTED_BY, ACT_DATE, START_TIME, END_TIME,  STATUS ) 
+            VALUES (:id, :employee_id, :employee_department, :act_type, :activitydate, :start_time, :end_time,  '0')");
+            $sql->bindParam(':id', $id);
+            $sql->bindParam(':employee_id', $employee_id);
+            $sql->bindParam(':employee_department', $employee_department);
+            $sql->bindParam(':act_type', $act_type);
+            $sql->bindParam(':activitydate', $activitydate);
+            $sql->bindParam(':start_time', $start_time);
+            $sql->bindParam(':end_time', $end_time);
+           
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($paramnum, '43', $username);
+
+ 
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
 
 
             public function update_activity_note($act_id,$client_name,$phone=null,$act_date, $start_time, $end_time, $act_type, $act_desc,$username){

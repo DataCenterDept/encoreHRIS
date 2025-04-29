@@ -140,27 +140,24 @@ require('views/_head.php');
 
 
                                 <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mt-3">
-                                        <table id="activity-note-datatable" class="table table-bordered table-hover align-middle dt-responsive nowrap w-100">
-                                            <thead>
-                                                <tr>
-                                                    <th class="all">Details</th>
-                                                    <th class="all">Username</th>
-                                                    <!-- <th class="all">Client Name</th> -->
-                                                    <th class="">Notes</th>
-                                                    <th class="all">Activity Type</th>
-                                                    <th class="all">Activity Date</th>
-                                                    <th class="all">Mobile Number</th>
-                                                    <th class="all">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
+                                    <div class="col-md-12">
+                                        <div class="mt-3">
+                                            <table id="activity-note-datatable" class="table table-bordered table-hover align-middle dt-responsive nowrap w-100">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="all">View</th>
+                                                        <th class="all">Employee</th>
+                                                        <th class="all">Department</th>
+                                                        <th class="all">Activity Date & Time</th>
+                                                        <th class="all">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
                                     </div>
+                                </div>
 
-                                </div>
-                                </div>
 
 
                             </div>
@@ -169,7 +166,7 @@ require('views/_head.php');
                 </div>
 
                 <!-- MODAL for item ACTIVITY NOTE   -->
-               <div id="mdl_add_activity" class="modal fade" role="dialog">
+                <div id="mdl_add_activity" class="modal fade" role="dialog">
                     <div class="modal-dialog modal-lg">
                         <!-- Modal content-->
                         <div class="modal-content">
@@ -179,67 +176,50 @@ require('views/_head.php');
                             </div>
                             <form action="" id="addactivityForm">
                                 <div class="modal-body">
-                                <div class="row">
-                                    <label class="form-label">CLIENT INFORMATION </label>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label for="client_fname" class="form-label">Client Name</label>
-                                        <input type="text" class="form-control" name="client_name" id="client_name" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="client_num">Phone Number</label>
-                                        <input type="text" class="form-control" name="client_num" id="client_num">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <label class="form-label mt-4">ACTIVITY DETAILS </label>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 mb-2">
-                                        <label for="act_type">Activity Type<span class="required">*</span></label>
-                                        <select name="act_type" class="form-control select2" id="act_type">
-                                            <option value='' selected>-- --</option>
-                                            <?php echo $api->generate_activity_type_options(); ?>
-                                        </select>
-                                    </div>
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                            <label for="activitydate" class="form-label">Activity Date <span class="required">*</span></label>
-                                            <div class="input-group" id="date-activity-container">
-                                                <input type="text" class="form-control" id="act_date" name="act_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#date-activity-container" data-provide="datepicker" data-date-autoclose="true">
-                                                <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                        <div class="col-md-12 mb-2">
+                                            <label for="act_type">Officer<span class="required">*</span></label>
+                                            <select name="act_type" class="form-control select2" id="act_type">
+                                                <option value='' selected>-- --</option>
+                                                <?php echo $api->generate_active_employee_options(); ?>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                <label for="activitydate" class="form-label">Activity Date <span class="required">*</span></label>
+                                                <div class="input-group" id="date-activity-container">
+                                                    <!-- Changed name from act_date to activitydate -->
+                                                    <input type="text" class="form-control" id="activitydate" name="activitydate" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#date-activity-container" data-provide="datepicker" data-date-autoclose="true">
+                                                    <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                                </div>
+                                                </div>
                                             </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                <label for="starttime" class="form-label">Start Time <span class="required">*</span></label>
+                                                <input type="time" id="starttime" name="starttime" class="form-control" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                <label for="endtime" class="form-label">End Time <span class="required">*</span></label>
+                                                <input type="time" id="endtime" name="endtime" class="form-control" autocomplete="off">
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                            <label for="starttime" class="form-label">Start Time <span class="required">*</span></label>
-                                            <input type="time" id="starttime" name="starttime" class="form-control" autocomplete="off">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                            <label for="endtime" class="form-label">End Time <span class="required">*</span></label>
-                                            <input type="time" id="endtime" name="endtime" class="form-control" autocomplete="off">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 mb-2">
-                                        <label for="act_desc">Description</label>
-                                        <textarea name="act_desc" id="act_desc" cols="30" rows="3" class="form-control"></textarea>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-primary" id="submitform">Submit</button>
                                 </div>
-                                </div>
                             </form>
                         </div>
                     </div>
-                    </div>
+                </div>
+
 
 
 

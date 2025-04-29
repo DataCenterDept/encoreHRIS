@@ -1201,25 +1201,7 @@
           }
         }
       );
-
-      if ("geolocation" in navigator) {
-        navigator.geolocation.watchPosition(
-          (position) => {
-            localStorage.setItem("longitude", position.coords.longitude);
-            localStorage.setItem("latitude", position.coords.latitude);
-          },
-          function (error) {
-            if (error.code == error.PERMISSION_DENIED) {
-              show_alert("Location", `Please Allow the Location`, "error");
-              $("#submitform").prop("disabled", true);
-              localStorage.setItem("longitude", null);
-              localStorage.setItem("latitude", null);
-            }
-          }
-        );
-      } else {
-        alert("Location not available");
-      }
+ 
     }
     if ($("#item-category-datatable").length) {
       setTimeout(() => {

@@ -13901,67 +13901,80 @@ $('#addactivityForm').validate({
     submitHandler: function (form) {
         transaction = 'submit add activity';
 
-        var long =localStorage.getItem("longitude");
+        var long = localStorage.getItem("longitude");
         var lat = localStorage.getItem("latitude");
-        var username = $('#username').html()
+        var username = $('#username').html();
     
         if(long && lat != 'null'){
-
             $.ajax({
                 type: 'POST',
                 url: 'controller.php',
                 data: $(form).serialize() +'&long='+ long + '&lat='+ lat + '&username=' + username + '&transaction=' + transaction,
                 beforeSend: function(){
                     document.getElementById('submitform').disabled = true;
-                    $('#submitform').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    $('#submitform').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div>');
                 },
                 success: function (response) {
-                   var s = JSON.parse(response)
-                    
-               
+                    try {
+                        // Properly parse JSON response
+                        var data = JSON.parse(response);
+                        
                         $('.modal').modal('hide');
-                    
-                        if(s === 'Added'){
-                            show_alert_event('Inserted', 'Activity has been inserted.', 'success',"reload");
-                            
+                        
+                        if(data.status === 'Inserted'){
+                            show_alert_event('Success', 'Activity has been inserted.', 'success', "reload");
+                        } else if(data.status === 'Updated'){
+                            show_alert_event('Success', 'Activity has been updated.', 'success', "reload");
+                        } else {
+                            show_alert('Error', data.message || 'An unknown error occurred', 'error');
                         }
-                        //generate_datatable('training report table', '#training-report-datatable', 0, 'desc', [6]);
-              
-                    else{
-                        show_alert('Training Error', response, 'error');
+                    } catch(e) {
+                        console.error("JSON parsing error:", e);
+                        console.error("Response received:", response);
+                        show_alert('Error', 'Invalid server response format', 'error');
                     }
+                },
+                error: function(xhr, status, error) {
+                    show_alert('Ajax Error', error, 'error');
                 },
                 complete: function(){
                     document.getElementById('submitform').disabled = false;
                     $('#submitform').html('Submit');
                 }
             });
-        }else{
-            show_alert('Location',"Failed to add, Your Location is not available", 'error');
+        } else {
+            show_alert('Location', "Failed to add, Your Location is not available", 'error');
         }
         
         return false;
     },
     rules: {
-       
         act_type: {
             required: true
         },
-        act_desc :{
-            required: true,
+        activitydate: { // Updated to match form field name
+            required: true
+        },
+        starttime: {
+            required: true
+        },
+        endtime: {
+            required: true
         }
-        
     },
     messages: {
-        
         act_type: {
             required: 'Please select Type',
         },
-        act_desc :{
-            required: 'Please enter your activiy Description',
+        activitydate: { // Updated to match form field name
+            required: 'Please enter activity date',
+        },
+        starttime: {
+            required: 'Please enter start time',
+        },
+        endtime: {
+            required: 'Please enter end time',
         }
-
-        
     },
     errorPlacement: function(label, element) {
         if(element.hasClass('form-select2') && element.next('.select2-container').length) {

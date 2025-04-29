@@ -481,15 +481,14 @@ function generate_datatable(type, datatablename, order, ordertype, unsort, butto
     }
     else if(type == 'activity table'){
         column = [ 
-            { 'data' : 'EMP_LOCATION'},
             { 'data' : 'EMP_FULLNAME' }, 
-            { 'data' : 'NOTES' }, 
-            { 'data' : 'ACTIVITY_TYPE' },
-            { 'data' : 'ACTIVITY_DATE' },
-            { 'data' : 'CLIENT_NUM' },
+            { 'data' : 'USER_DEPT' },
+            { 'data' : 'ACTIVITY_DATE_TIME' },
             { 'data' : 'ACTION' }
         ];
-    }else if(type == 'activity table attachment'){
+    }
+    
+    else if(type == 'activity table attachment'){
         column = [ 
             { 'data' : 'TITLE'},
             { 'data' : 'ACTION' }
