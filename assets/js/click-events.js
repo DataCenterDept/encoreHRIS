@@ -8102,6 +8102,10 @@ function formatDateTime(dateTimeString) {
         $("#upt_client_num").val(data.CLIENT_TEL);
         $("#upt_act_type").val(data.NOTE_TYPE).change();
         $("#upt_act_desc").val(data.NOTE_DESC);
+        $("#upt_act_date").val(data.ACT_DATE);
+        $("#upt_starttime").val(data.START_TIME);
+        $("#upt_endtime").val(data.END_TIME);
+
       }
     );
   });

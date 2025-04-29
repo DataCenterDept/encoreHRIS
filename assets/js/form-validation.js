@@ -13950,6 +13950,7 @@ $('#addactivityForm').validate({
         act_desc :{
             required: true,
         }
+        
     },
     messages: {
         

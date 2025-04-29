@@ -61,7 +61,7 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <h4 class="card-title">TEST holiday Employee Table</h4>
+                                                <h4 class="card-title">Employee Table</h4>
                                             </div>
                                             <?php
                                                 if($add_holiday > 0){

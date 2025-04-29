@@ -7,8 +7,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 date_default_timezone_set('Asia/Manila'); // Or your correct timezone
-echo 'hello';
-
+ 
 class Api{
     # @var object $db_connection The database connection
     public $db_connection = null;
@@ -21867,19 +21866,26 @@ public function update_pr($prno,$remarks, $requested_by,$bud_con,$bud_con_rem, $
             # Returns    : String
             #
             # -------------------------------------------------------------
-            public function insert_activity_note($username,$client_name,$phone=null,$act_type,$act_desc,$long,$lat){
-          
+                 public function insert_activity_note($username,$client_name,$phone=null, $act_date, $start_time, $end_time, $act_type,$act_desc,$long,$lat){
+
                 $user_dept_code = $this->get_data_details_one_parameter("employee profile",$username)[0]['DEPARTMENT'];
 
                 if($this->databaseConnection()){
                     $date_time =  date('Y-m-d H:i:s');
-                    $sql = $this->db_connection->prepare('INSERT INTO tblactivitynotes (ACTIVITY_DATE, USERNAME, USER_DEPT, CLIENT_NAME, CLIENT_TEL, NOTE_TYPE, NOTE_DESC, GEO_LONG, GEO_LAT, CREATED_AT) 
-                    VALUES (:activity_date,:username,:user_dept_code,:client_name,:phone,:act_type,:act_desc,:long,:lat,:created_at)');
+                    $sql = $this->db_connection->prepare('INSERT INTO tblactivitynotes (ACTIVITY_DATE, USERNAME, USER_DEPT, CLIENT_NAME, CLIENT_TEL, ACT_DATE, START_TIME, END_TIME,  NOTE_TYPE, NOTE_DESC, GEO_LONG, GEO_LAT, CREATED_AT) 
+                    VALUES (:activity_date,:username,:user_dept_code,:client_name,:phone, :act_date, :start_time, :end_time, :act_type,:act_desc,:long,:lat,:created_at)');
+
+                    // $sql = $this->db_connection->prepare('INSERT INTO tblactivitynotes (ACTIVITY_DATE, USERNAME, USER_DEPT, CLIENT_NAME, CLIENT_TEL, ACT_DATE, START_TIME, END_TIME, NOTE_TYPE, NOTE_DESC, GEO_LONG, GEO_LAT, CREATED_AT) 
+                    // VALUES (:activity_date,:username,:user_dept_code,:client_name,:phone, :act_date, :start_time, :end_time, :act_type,:act_desc,:long,:lat,:created_at)');
                      $sql->bindParam(':activity_date', $date_time);
                      $sql->bindParam(':username', $username);
                      $sql->bindParam(':user_dept_code',$user_dept_code);
                      $sql->bindParam(':client_name',$client_name);
                      $sql->bindParam(':phone',$phone);
+                     $sql->bindParam(':act_date',$act_date);
+                     $sql->bindParam(':start_time',$start_time);
+                     $sql->bindParam(':end_time',$end_time);
+
                      $sql->bindParam(':act_type',$act_type);
                      $sql->bindParam(':act_desc',$act_desc);
                      $sql->bindParam(':long',$long);
@@ -21900,19 +21906,32 @@ public function update_pr($prno,$remarks, $requested_by,$bud_con,$bud_con_rem, $
             }
 
 
-            public function update_activity_note($act_id,$client_name,$phone=null,$act_type,$act_desc,$username){
+            public function update_activity_note($act_id,$client_name,$phone=null,$act_date, $start_time, $end_time, $act_type, $act_desc,$username){
           
                // $user_dept_code = $this->get_data_details_one_parameter("employee profile",$username)[0]['DEPARTMENT'];
 
 
                 if($this->databaseConnection()){
                   
-                    $sql = $this->db_connection->prepare('UPDATE tblactivitynotes SET CLIENT_NAME=:client_name, CLIENT_TEL=:phone, NOTE_TYPE=:act_type, NOTE_DESC=:act_desc  WHERE ID=:act_id');
-                     $sql->bindParam(':client_name',$client_name);
-                     $sql->bindParam(':phone',$phone);
-                     $sql->bindParam(':act_type',$act_type);
-                     $sql->bindParam(':act_desc',$act_desc);
+                    $sql = $this->db_connection->prepare('UPDATE tblactivitynotes 
+                    SET CLIENT_NAME = :upt_client_name, 
+                        CLIENT_TEL = :upt_client_num, 
+                        ACT_DATE = :upt_act_date, 
+                        START_TIME = :upt_starttime, 
+                        END_TIME = :upt_endtime, 
+                        NOTE_TYPE = :upt_act_type, 
+                        NOTE_DESC = :upt_act_desc  
+                          WHERE ID = :act_id');
+                     $sql->bindParam(':upt_client_name',$client_name);
+                     $sql->bindParam(':upt_client_num',$phone);
+                     $sql->bindParam(':upt_act_date',$act_date);
+                     $sql->bindParam(':upt_starttime', $start_time);
+                     $sql->bindParam(':upt_endtime', $end_time);
+                     
+                     $sql->bindParam(':upt_act_type',$act_type);
+                     $sql->bindParam(':upt_act_desc',$act_desc);
                      $sql->bindParam(':act_id',$act_id);
+
                    
                      
                     if ($sql->execute()) {

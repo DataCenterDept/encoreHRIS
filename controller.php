@@ -10973,11 +10973,14 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
         $act_id = $_POST['act_id'];
         $client_name = $_POST['upt_client_name'];
         $client_num = $_POST['upt_client_num'];
+        $act_date = $_POST['upt_act_date'];
+        $start_time = $_POST['upt_starttime'];
+        $end_time = $_POST['upt_endtime'];
         $act_type = $_POST['upt_act_type'];
         $act_desc = $_POST['upt_act_desc'];
         $username = $_POST['username'];
-
-        $res = $api->update_activity_note($act_id, $client_name, $client_num, $act_type, $act_desc, $username);
+     
+        $res = $api->update_activity_note($act_id, $client_name, $client_num, $act_date, $start_time, $end_time, $act_type, $act_desc, $username);
         echo json_encode($res);
     }
 
@@ -10990,8 +10993,11 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
         $act_desc = $_POST['act_desc'];
         $long = $_POST['long'];
         $lat = $_POST['lat'];
-
-        $res = $api->insert_activity_note($username, $client_name, $client_num, $act_type, $act_desc, $long, $lat);
+        $act_date =$_POST['act_date'];
+        $start_time = $_POST['starttime'];
+        $end_time = $_POST['endtime'];
+        $res = $api->insert_activity_note($username, $client_name, $client_num, $act_date, $start_time,  $end_time, $act_type, $act_desc, $long, $lat);
+ 
         echo json_encode($res);
     }
     #Get activity details

@@ -369,14 +369,14 @@
 //                     </li>';
 //         }
 
-//         if($activity_note_page > 0){
-//             $menu .= '<li>
-//                         <a href="activity-note.php" class="waves-effect">
-//                             <i class="bx bx-edit-alt"></i>
-//                             <span key="t-employee-modules">Activity Notes</span>
-//                         </a>
-//                     </li>';
-//         }
+        if($activity_note_page > 0){
+            $menu .= '<li>
+                        <a href="activity-note.php" class="waves-effect">
+                            <i class="bx bx-edit-alt"></i>
+                            <span key="t-employee-modules">Activity Notes</span>
+                        </a>
+                    </li>';
+        }
 
 //         if($insurance_req_page > 0){
 //             $menu .= '<li>
