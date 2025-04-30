@@ -8087,22 +8087,20 @@ function formatDateTime(dateTimeString) {
   $(document).on("click", ".btn-update-activity", function () {
     generate_select_option("#upt_act_type", "activity type option");
     $("#mdl_update_activity").modal("show");
-    var act_id = $(this).data("activityid");
+    var ACT_ID = $(this).data("ACT_ID");
     ajax_request(
       "controller.php",
-      { transaction: "get activity details", activity_id: act_id },
+      { transaction: "get activity details", ACT_ID: ACT_ID},
       function (d) {
         //console.log(d);
       },
       function (d) {
         var data = d.responseJSON;
         console.log(data);
-        $("#act_id").val(act_id);
+        $("#ACT_ID").val(ACT_ID);
         $("#upt_client_name").val(data.CLIENT_NAME);
-        $("#upt_client_num").val(data.CLIENT_TEL);
-        $("#upt_act_type").val(data.NOTE_TYPE).change();
-        $("#upt_act_desc").val(data.NOTE_DESC);
-        $("#upt_act_date").val(data.ACT_DATE);
+         $("#upt_act_type").val(data.NOTE_TYPE).change();
+         $("#upt_act_date").val(data.ACT_DATE);
         $("#upt_starttime").val(data.START_TIME);
         $("#upt_endtime").val(data.END_TIME);
 
@@ -8694,7 +8692,7 @@ function formatDateTime(dateTimeString) {
       "#activity-note-datatable",
       5,
       "desc",
-      [7]
+      [6]
     );
   });
   $(document).on("click", "#apply-meeting-filter", function () {

@@ -17874,19 +17874,19 @@ public function update_document_tags($document_id, $tags) {
 
 
 
-
-                        case 'activity note':
-                            $response[] = array(
-                                'ACT_ID' => $row['ID'],
-                                'CLIENT_NAME' => $row['CLIENT_NAME'],
-                                'CLIENT_TEL' => $row['CLIENT_TEL'],
-                                'NOTE_TYPE' => $row['NOTE_TYPE'],
-                                'NOTE_DESC' => $row['NOTE_DESC'],
-                                'LAT' => $row['GEO_LAT'],
-                                'LONG' => $row['GEO_LONG']
-                                
-                            );
-                            break;   
+                            // In api.php - activity note case
+                            case 'activity note':
+                                $response[] = array(
+                                    'ACT_ID' => $row['ID'],
+                                    'CLIENT_NAME' => $row['CLIENT_NAME'],
+                                    'NOTE_TYPE' => $row['NOTE_TYPE'],
+                                    'NOTE_DESC' => $row['NOTE_DESC'],
+                                    'ACTIVITY_DATE' => $row['ACTIVITY_DATE'], // Add this
+                                    'ACT_DATE' => $row['ACTIVITY_DATE'],      // For compatibility
+                                    'START_TIME' => $row['START_TIME'] ?? '', // Add these if they exist
+                                    'END_TIME' => $row['END_TIME'] ?? '',     // Add these if they exist
+                                );
+                                break;
 
 
 

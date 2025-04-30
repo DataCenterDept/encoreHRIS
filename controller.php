@@ -11050,7 +11050,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
     #Get activity details
     else if ($transaction == "get activity details") {
 
-        $act_id  = $_POST['activity_id'];
+        $act_id  = $_POST['ACT_ID'];
         $res = $api->get_data_details_one_parameter('activity note', $act_id);
         echo json_encode($res[0]);
     }

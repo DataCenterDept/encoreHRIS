@@ -1184,9 +1184,9 @@
       generate_datatable(
         "activity table",
         "#activity-note-datatable",
-        5,
+        4,
         "desc",
-        [0, 7]
+        [0, 6]
       );
       var username = $("#username").html();
       var transaction = "get permission";
@@ -1201,8 +1201,10 @@
           }
         }
       );
- 
+
+   
     }
+    
     if ($("#item-category-datatable").length) {
       setTimeout(() => {
         //select the 1st option

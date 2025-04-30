@@ -12,10 +12,9 @@ $add_activity = $api->check_role_permissions($username, 387);
 if ($page_access == 0 || !isset($_GET['id']) || empty($_GET['id'])) {
     header('location: 404-page.php');
 } else {
-    $id = $_GET['id'];
+    $id = $_GET['ACT_ID'];
     $activity_notes = $api->get_data_details_one_parameter('activity note', $id);
-    $lat_long = $activity_notes[0]['LAT'].','.$activity_notes[0]['LONG'];
-}
+ }
 
 
 
@@ -110,10 +109,7 @@ require('views/_head.php');
                                                 <div class="col-md-8"><?php echo $activity_notes[0]['CLIENT_NAME'] ?></div>
                                             </div>
 
-                                            <div class="row mt-3">
-                                                <div class="col-md-4"><b>Phone Number : </b></div>
-                                                <div class="col-md-8"><?php echo $activity_notes[0]['CLIENT_TEL'] ?></div>
-                                            </div>
+                                  
 
                                             <div class="row mt-3">
                                                 <div class="col-md-4"><b>Notes : </b></div>

@@ -482,12 +482,12 @@ function generate_datatable(type, datatablename, order, ordertype, unsort, butto
     else if(type == 'activity table'){
         column = [ 
             { 'data' : 'EMP_FULLNAME' }, 
-            { 'data' : 'USER_DEPT' },
-            { 'data' : 'ACTIVITY_DATE_TIME' },
+            { 'data' : 'NOTES' }, 
+            { 'data' : 'ACTIVITY_TYPE' },
+            { 'data' : 'ACT_DATE' },
             { 'data' : 'ACTION' }
         ];
     }
-    
     else if(type == 'activity table attachment'){
         column = [ 
             { 'data' : 'TITLE'},
@@ -902,7 +902,7 @@ function generate_datatable(type, datatablename, order, ordertype, unsort, butto
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-5'i><'col-sm-7'p>>",
                 buttons: [
-                    {extend : 'csv',exportOptions: {columns : [1,2,3,4,5,6]}},{extend : 'excel',exportOptions: {columns : [1,2,3,4,5,6]}}, {extend : 'pdf',exportOptions: {columns : [1,2,3,4,5,6]}}
+                    {extend : 'csv',exportOptions: {columns : [0, 1,2,3]}},{extend : 'excel',exportOptions: {columns : [0, 1,2,3]}}, {extend : 'pdf',exportOptions: {columns : [0, 1,2,3,4]}}
                 ],
 
                 

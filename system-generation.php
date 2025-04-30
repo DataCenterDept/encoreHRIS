@@ -15618,224 +15618,121 @@ else if($type == 'publish documents table'){
             $view_own_activity = $api->check_role_permissions($username, 382);
             $view_dept_activity = $api->check_role_permissions($username, 381);
             $view_all_activity = $api->check_role_permissions($username, 380);
-            $update_activity = $api->check_role_permissions($username, 384);
+             $update_activity = $api->check_role_permissions($username, 384);
             $delete_activity = $api->check_role_permissions($username, 385);
             $employee_details = $api->get_data_details_one_parameter('employee profile', $username);
-            $employee_dept = isset($employee_details[0]['DEPARTMENT']) ? $employee_details[0]['DEPARTMENT'] : 'N/A';
+            $employee_dept = $employee_details[0]['DEPARTMENT'];
             $sql = '';
-            $response = array(); // Initialize response array
-            
-            // DEBUG: Log permission levels and user info
-            echo "<script>console.log('DEBUG PERMISSIONS: View own: {$view_own_activity}, View dept: {$view_dept_activity}, View all: {$view_all_activity}, Username: {$username}, Dept: {$employee_dept}');</script>";
-            
+
             //date filtering
             $start_date='';
             $end_date = '';
-            if(empty($_POST["filter_start_date"]) && empty($_POST["filter_end_date"])){
-                // Set a wider date range to ensure we capture all records for debugging
-                $start_date = '2023-01-01'; // Changed from current month to include more data
-                $end_date = '2026-12-31';   // Extended end date for future records
-                
-                // Original code commented for reference
-                // $start_date = date('Y-m-01');
-                // $end_date = date('Y-m-t');
-            } else {
+            if($_POST["filter_start_date"]=="" && $_POST["filter_end_date"]==""){
+                $start_date =  date('Y-m-01');
+                $end_date  =   date('Y-m-t');
+            }else{
                 $date_start = new DateTime($_POST['filter_start_date']);
                 $start_date = $date_start->format('Y-m-d');
-    
+
                 $date_end = new DateTime($_POST['filter_end_date']);
                 $end_date = $date_end->format('Y-m-d');
             }
-            
-            // DEBUG: Log the date filter being applied
-            echo "<script>console.log('DEBUG DATE FILTER: {$start_date} to {$end_date}');</script>";
-            
-            // Temporarily comment out date filtering to show all records
-            // $filtering_date = "AND DATE(an.ACT_DATE) BETWEEN '{$start_date}' AND '{$end_date}' ";
-            $filtering_date = ""; // Remove date filter temporarily
-    
+            $filtering_date = "AND DATE(an.ACTIVITY_DATE) BETWEEN  '".$start_date."' AND '".$end_date."' ";
+
+
             //department filtering
             $filter_dept = '';
-            if(isset($_POST['filter_department']) && $_POST['filter_department']!=""){
+            if($_POST['filter_department']!=""){
                 $filter_dept = " AND an.USER_DEPT ='".$_POST['filter_department']."' ";
             }
-    
+
             //activity type filtering
             $filter_act_type = '';
-            if(isset($_POST['filter_act_type']) && $_POST['filter_act_type']!=""){
-                $filter_act_type = " AND an.NOTED_BY ='".$_POST['filter_act_type']."' ";
+            if($_POST['filter_act_type']!=""){
+                $filter_act_type = " AND an.NOTE_TYPE ='".$_POST['filter_act_type']."' ";
             }
-    
-            // DEBUG: Use a simplified query for testing that bypasses permission checks
-            try {
-                // Use a simple query first to ensure data exists and is accessible
-                $debug_sql = $api->db_connection->prepare("SELECT COUNT(*) as record_count FROM tblactivitynotes");
-                $debug_sql->execute();
-                $count_result = $debug_sql->fetch(PDO::FETCH_ASSOC);
-                echo "<script>console.log('DEBUG TOTAL RECORDS: " . json_encode($count_result) . "');</script>";
-                
-                // Now attempt with the regular query but bypassing permission checks for debugging
-                $sql = $api->db_connection->prepare("SELECT an.*,
-                    CONCAT(IFNULL(ep.LAST_NAME, ''), ', ', IFNULL(ep.FIRST_NAME, ''), ' ', IFNULL(ep.MIDDLE_NAME, '')) as EMP_FULLNAME,
-                    ep.EMPLOYEE_ID,
-                    ep.DEPARTMENT as EMP_LOCATION
-                    FROM tblactivitynotes as an
-                    LEFT JOIN tblemployeeprofile as ep ON ep.EMPLOYEE_ID = an.USERNAME
-                    WHERE 1=1 {$filter_dept} {$filter_act_type}
-                    LIMIT 50"); // Limit to 50 records for testing
-                    
-                // Only use the permission-based queries after confirming the data loads correctly
-                /* Original permission-based queries
-                if ($view_own_activity > 0) {
-                    $sql = $api->db_connection->prepare("SELECT an.*,
-                        CONCAT(ep.LAST_NAME, ', ', ep.FIRST_NAME, ' ', IFNULL(ep.MIDDLE_NAME, '')) as EMP_FULLNAME 
-                        FROM tblactivitynotes as an
-                        LEFT JOIN tblemployeeprofile as ep ON ep.EMPLOYEE_ID = an.USERNAME
-                        WHERE an.USERNAME = :username ".$filtering_date.$filter_dept.$filter_act_type);
-                    $sql->bindParam(':username', $username);
-                } 
-                else if ($view_dept_activity > 0) {
-                    $sql = $api->db_connection->prepare("SELECT an.*,
-                        CONCAT(ep.LAST_NAME, ', ', ep.FIRST_NAME, ' ', IFNULL(ep.MIDDLE_NAME, '')) as EMP_FULLNAME 
-                        FROM tblactivitynotes as an
-                        LEFT JOIN tblemployeeprofile as ep ON ep.EMPLOYEE_ID = an.USERNAME
-                        WHERE an.USER_DEPT = :employee_dept ".$filtering_date.$filter_dept.$filter_act_type);
-                    $sql->bindParam(':employee_dept', $employee_dept);
-                } 
-                else if ($view_all_activity > 0) {
-                    $sql = $api->db_connection->prepare("SELECT an.*,
-                        CONCAT(ep.LAST_NAME, ', ', ep.FIRST_NAME, ' ', IFNULL(ep.MIDDLE_NAME, '')) as EMP_FULLNAME 
-                        FROM tblactivitynotes as an
-                        LEFT JOIN tblemployeeprofile as ep ON ep.EMPLOYEE_ID = an.USERNAME
-                        WHERE 1 ".$filtering_date.$filter_dept.$filter_act_type);
-                } else {
-                    echo json_encode(array("error" => "No permissions to view activity"));
-                    return;
-                }
-                */
-            } catch (Exception $e) {
-                echo "<script>console.error('DEBUG SQL ERROR: " . $e->getMessage() . "');</script>";
-                echo json_encode(array("error" => "SQL Error: " . $e->getMessage()));
-                return;
+
+
+            if ($view_own_activity > 0) {
+
+                $sql = $api->db_connection->prepare("SELECT an.*,CONCAT(ep.LAST_NAME,',  ',ep.FIRST_NAME,', ',ep.MIDDLE_NAME)  as EMP_FULLNAME, sc.SYSTEM_DESC  as ACT_NOTE_TYPE
+                FROM  tblactivitynotes as an
+                LEFT JOIN tblemployeeprofile as ep on ep.USERNAME = an.USERNAME
+                LEFT JOIN tblsystemcode as sc on sc.SYSTEM_CODE = an.NOTE_TYPE
+                WHERE an.USERNAME =:username ".$filtering_date.$filter_dept.$filter_act_type);
+                $sql->bindParam(':username', $username);
+
+            }  if ($view_dept_activity > 0) {
+
+                $sql = $api->db_connection->prepare("SELECT an.*,CONCAT(ep.LAST_NAME,',  ',ep.FIRST_NAME,', ',ep.MIDDLE_NAME) as EMP_FULLNAME, sc.SYSTEM_DESC as ACT_NOTE_TYPE 
+                FROM  tblactivitynotes as an
+                LEFT JOIN tblemployeeprofile as ep on ep.USERNAME = an.USERNAME
+                LEFT JOIN tblsystemcode as sc on sc.SYSTEM_CODE = an.NOTE_TYPE
+                WHERE an.USER_DEPT =:employee_dept ".$filtering_date.$filter_dept.$filter_act_type);
+                $sql->bindParam(':employee_dept', $employee_dept);
+
+            }  if ($view_all_activity > 0) {
+                $sql = $api->db_connection->prepare("SELECT an.*,CONCAT(ep.LAST_NAME,', ',ep.FIRST_NAME,', ',ep.MIDDLE_NAME)  as EMP_FULLNAME, sc.SYSTEM_DESC as ACT_NOTE_TYPE 
+                FROM  tblactivitynotes as an
+                LEFT JOIN tblemployeeprofile as ep on ep.USERNAME = an.USERNAME
+                LEFT JOIN tblsystemcode as sc on sc.SYSTEM_CODE = an.NOTE_TYPE
+                WHERE 1 ".$filtering_date.$filter_dept.$filter_act_type);
             }
-    
-            if($sql && $sql->execute()){
-                // Debug to count results
-                $result_count = $sql->rowCount();
-                echo "<script>console.log('DEBUG ROWS RETURNED: {$result_count}');</script>";
-                
+
+
+           // $sql = $api->db_connection->prepare("SELECT TRAINING_ID, EMPLOYEE_ID, TITLE, STATUS, TRAINING_TYPE, TRAINING_DATE, START_TIME, END_TIME FROM tbltraining WHERE (STATUS = '2' OR STATUS = '6') AND TRAINING_DATE <= :system_date AND TRAINING_ID IN (SELECT TRAINING_ID FROM tbltrainingattendees WHERE EMPLOYEE_ID = :username) ORDER BY TRAINING_DATE DESC");
+            //actions
+
+
+            if($sql->execute()){
                 while($row = $sql->fetch()){
+      
                     $act_id = trim($row['ACT_ID']);
-                    $username = trim($row['USERNAME']);
-                    $user_dept = trim($row['USER_DEPT']);
-                    $noted_by = trim($row['NOTED_BY']);
-                    $act_date = trim($row['ACT_DATE']);
-                    $start_time = trim($row['START_TIME']);
-                    $end_time = trim($row['END_TIME']);
-                    $emp_fullname = isset($row['EMP_FULLNAME']) ? trim($row['EMP_FULLNAME']) : 'N/A';
-                    
-                    // Debug each row fetched
-                    echo "<script>console.log('DEBUG ROW: " . json_encode($row) . "');</script>";
-                    
-                    // Format the date and time as requested: MM/DD/YYYY H:MM AM -> H:MM PM
-                    $formatted_date = '';
-                    if(!empty($act_date)) {
-                        // Convert date format
-                        $date_obj = DateTime::createFromFormat('Y-m-d', $act_date);
-                        if(!$date_obj) {
-                            // Try alternative date formats if Y-m-d fails
-                            $date_obj = DateTime::createFromFormat('m/d/Y', $act_date);
-                            if(!$date_obj) {
-                                $date_obj = DateTime::createFromFormat('d/m/Y', $act_date);
-                            }
-                        }
-                        
-                        if($date_obj) {
-                            $formatted_date = $date_obj->format('m/d/Y');
-                        } else {
-                            $formatted_date = $act_date; // Keep original if conversion fails
-                            echo "<script>console.log('DEBUG DATE FORMAT FAILED for: {$act_date}');</script>";
-                        }
-                        
-                        // Format times
-                        $formatted_start = '';
-                        $formatted_end = '';
-                        
-                        if(!empty($start_time)) {
-                            // Format start time to 12-hour format
-                            $start_time_obj = DateTime::createFromFormat('H:i', $start_time);
-                            if(!$start_time_obj) {
-                                // Try alternative time formats
-                                $start_time_obj = DateTime::createFromFormat('H:i:s', $start_time);
-                                if(!$start_time_obj) {
-                                    $start_time_obj = DateTime::createFromFormat('g:i a', $start_time);
-                                }
-                            }
-                            
-                            if($start_time_obj) {
-                                $formatted_start = $start_time_obj->format('g:i a');
-                            } else {
-                                $formatted_start = $start_time;
-                                echo "<script>console.log('DEBUG START TIME FORMAT FAILED for: {$start_time}');</script>";
-                            }
-                        }
-                        
-                        if(!empty($end_time)) {
-                            // Format end time to 12-hour format
-                            $end_time_obj = DateTime::createFromFormat('H:i', $end_time);
-                            if(!$end_time_obj) {
-                                // Try alternative time formats
-                                $end_time_obj = DateTime::createFromFormat('H:i:s', $end_time);
-                                if(!$end_time_obj) {
-                                    $end_time_obj = DateTime::createFromFormat('g:i a', $end_time);
-                                }
-                            }
-                            
-                            if($end_time_obj) {
-                                $formatted_end = $end_time_obj->format('g:i a');
-                            } else {
-                                $formatted_end = $end_time;
-                                echo "<script>console.log('DEBUG END TIME FORMAT FAILED for: {$end_time}');</script>";
-                            }
-                        }
-                        
-                        // Combine all into one formatted string
-                        $formatted_datetime = $formatted_date . ' ' . $formatted_start . ' -> ' . $formatted_end;
-                    }
-                    
-                    // Build action buttons
+                    $partner = trim($row['EMP_FULLNAME']);
+                    $activity_note = trim($row['NOTE_DESC']);
+                    $activity_type = trim($row['ACT_NOTE_TYPE']);
+                    $activity_date = trim($row['ACT_DATE']);
+                    $start_time= trim($row['START_TIME']);
+                    $end_time= trim($row['END_TIME']);
+
+
                     $actions = '';
                     if($update_activity > 0){
-                        $actions .= '<button class="btn btn-warning btn-sm btn-update-activity" data-activityid="'. $act_id .'"><i class="bx bx-edit font-size-16 align-middle"></i></button> ';
+                        $actions .= '<a href="activity-notes-details.php?id=' . $act_id . '" class="btn btn-primary waves-effect waves-light"><i class="font-size-16 align-middle"></i>view</a>';
+
+                    }
+                    if($update_activity > 0){
+                        $actions .= '<button class="btn btn-warning btn-update-activity" data-activityid="'. $act_id .'">update</button>';
+
+
                     }
                     if($delete_activity > 0){
-                        $actions .= '<button class="btn btn-danger btn-sm btn-delete-activity" data-activityid="'. $act_id .'"><i class="bx bx-trash font-size-16 align-middle"></i></button>';
-                    }
-    
+                        $actions .= '<button  class="btn btn-danger btn-delete-activity" data-activityid="'. $act_id .'" >delete</button>';
+                    }  
+
                     $response[] = array(
-                        'EMP_LOCATION' => '<a href="activity-notes-details.php?id='.$act_id.'" class="btn btn-primary btn-sm waves-effect waves-light"><i class="bx bx-show font-size-16 align-middle"></i></a>',
-                        'EMP_FULLNAME' => $emp_fullname,
-                        'USER_DEPT' => $user_dept,
-                        'ACTIVITY_DATE_TIME' => $formatted_datetime,
-                        'ACTION' => '<div class="d-flex gap-2">'.$actions.'</div>'
+                        'EMP_FULLNAME' => $partner,
+                        'NOTES' => $activity_note,
+                        'ACTIVITY_TYPE' => $activity_type,
+                        'ACT_DATE' => '<b>' . date("F j, Y", strtotime($activity_date)) . '<br>' .
+                        date("g:i a", strtotime($start_time)) . ' -> ' . date("g:i a", strtotime($end_time)) . '</b>',
+                        'ACTION' => '<div class="d-flex gap-2">
+                               '.$actions.'
+                            </div>'
                     );
+
                 }
-    
+
                 echo json_encode($response);
             }
-            else {
-                // Enhanced error info for debugging
-                $error_info = $sql ? $sql->errorInfo() : "Query preparation failed";
-                echo "<script>console.error('DEBUG SQL EXECUTION ERROR: " . json_encode($error_info) . "');</script>";
-                echo json_encode(array("error" => $error_info));
+            else{
+                echo $sql->errorInfo()[2];
             }
-        } else {
-            echo "<script>console.error('DEBUG DB CONNECTION FAILED');</script>";
-            echo json_encode(array("error" => "Database connection failed"));
         }
     }
     
     
+
 
 
 
