@@ -2050,6 +2050,19 @@ function generate_datatable_three_parameter(type, parameter1, parameter2, parame
             { 'data' : 'REJECTION_REASON' }
         ];
     }
+
+      else if(type == 'overtime summary table'){
+        column = [
+            { 'data' : 'ATTACHMENT_PATH' }, 
+            { 'data' : 'LEAVE_NAME' }, 
+            { 'data' : 'LEAVE_DATE' }, 
+            { 'data' : 'LEAVE_STATUS' }, 
+            { 'data' : 'REASON' },
+            { 'data' : 'APPROVAL_DATE'},
+            { 'data' : 'CANCELATION_REASON' },
+            { 'data' : 'REJECTION_REASON' }
+        ];
+    }
     else if(type == 'attendance summary attendance adjustment table'){
         column = [ 
             { 'data' : 'TIME_IN_DATE' },

@@ -4290,6 +4290,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 <div class="col-md-3">
                                     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                                     <a class="nav-link mb-2 active" id="v-pills-attendance-record-tab" data-bs-toggle="pill" href="#v-pills-attendance-record" role="tab" aria-controls="v-pills-attendance-record" aria-selected="true">Attendance Record</a>
+                                    <a class="nav-link mb-2" id="v-pills-overtime-tab" data-bs-toggle="pill" href="#v-pills-overtime" role="tab" aria-controls="v-pills-overtime" aria-selected="false">Overtime</a>
                                     <a class="nav-link mb-2" id="v-pills-leave-tab" data-bs-toggle="pill" href="#v-pills-leave" role="tab" aria-controls="v-pills-leave" aria-selected="false">Leave</a>
                                     <a class="nav-link mb-2" id="v-pills-attendance-adjustment-tab" data-bs-toggle="pill" href="#v-pills-attendance-adjustment" role="tab" aria-controls="v-pills-attendance-adjustment" aria-selected="false">Attendance Adjustment</a>
                                     </div>
@@ -4313,6 +4314,29 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                                                 <th class="all">Early Leave</th>
                                                                 <th class="all">Overtime</th>
                                                                 <th>Remarks</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                            <div class="tab-pane fade" id="v-pills-overtime" role="tabpanel" aria-labelledby="v-pills-overtime-tab">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <table id="overtime-summary-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                        <thead>
+                                                            <tr>
+                                                            <th class="all">Title</th>
+                                                            <th class="all">Employee</th>
+                                                            <th class="all">Overtime Date</th>
+                                                            <th class="all">Time</th>
+                                                            <th class="all">Holiday Type</th>
+                                                            <th class="all">Status</th>
+                                                            <th class="none">Decision By</th>
+                                                            <th class="none">Decision Date</th>
+                                                            <th class="none">Rejection Reason</th>
+                                                            <th class="none">Cancellation Reason</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody></tbody>
@@ -14443,7 +14467,7 @@ else if($type == 'publish documents table'){
 // }
 
 
- # Training table
+ # Overtime table
     else if($type == 'overtime table'){
         if(isset($_POST['parameter1']) && isset($_POST['parameter2'])){
             if ($api->databaseConnection()) {
@@ -14593,7 +14617,117 @@ else if($type == 'publish documents table'){
                 }
             }
         }
+    } 
+
+    // **Overtime Summary Table**
+else if($type == 'overtime summary table'){
+    if(isset($_POST['parameter1']) && !empty($_POST['parameter1']) && isset($_POST['parameter2']) && !empty($_POST['parameter2']) && isset($_POST['parameter3']) && !empty($_POST['parameter3'])){
+        if ($api->databaseConnection()) {
+            $parameter1 = $_POST['parameter1']; // Employee ID
+            $parameter2 = $_POST['parameter2']; // Start date
+            $parameter3 = $_POST['parameter3']; // End date
+            
+            // Convert dates to database format
+            $start_date = $api->check_date('empty', $parameter2, '', 'Y-m-d', '', '', '');
+            $end_date = $api->check_date('empty', $parameter3, '', 'Y-m-d', '', '', '');
+            
+            // Use default range (current month) if dates are empty or invalid
+            if(empty($start_date)){
+                $start_date = date('Y-m-01');
+            }
+            if(empty($end_date)){
+                $end_date = date('Y-m-t');
+            }
+
+            // Query approved overtime entries (STATUS = '1') for the employee within date range
+            $sql = $api->db_connection->prepare("SELECT OVERTIME_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME, DECISION_DATE, DECISION_TIME, DECISION_BY, REJECTION_REASON, CANCELLATION_REASON FROM tblovertime WHERE EMPLOYEE_ID = :parameter1 AND OVERTIME_DATE BETWEEN :parameter2 AND :parameter3 AND STATUS = '1' ORDER BY OVERTIME_DATE DESC");
+            $sql->bindParam(':parameter1', $parameter1);
+            $sql->bindParam(':parameter2', $start_date);
+            $sql->bindParam(':parameter3', $end_date);
+
+            if($sql->execute()){
+                $response = array();
+                
+                while($row = $sql->fetch()){
+                    $overtime_id = trim($row['OVERTIME_ID']);
+                    $title = trim($row['TITLE']);
+                    $overtime_date = $api->check_date('empty', trim($row['OVERTIME_DATE']), '', 'm/d/Y', '', '', '');
+                    $status = trim($row['STATUS']);
+                    $decision_date = $api->check_date('empty', trim($row['DECISION_DATE']), '', 'm/d/Y', '', '', '');
+                    $decision_time = $api->check_date('empty', trim($row['DECISION_TIME']), '', 'h:i a', '', '', '');
+                    $holiday_type = $api->get_system_description('HOLIDAYTYPE', $row['HOLIDAY_TYPE']);
+                    $start_time = $api->check_date('empty', trim($row['START_TIME']), '', 'h:i a', '', '', '');
+                    $end_time = $api->check_date('empty', trim($row['END_TIME']), '', 'h:i a', '', '', '');
+                    $overtime_status = $api->get_training_status($status)[0]['BADGE'];
+                    $rejection_reason = trim($row['REJECTION_REASON']);
+                    $cancellation_reason = trim($row['CANCELLATION_REASON']);
+                    
+                    // Get decision maker details if available
+                    $decision_by = trim($row['DECISION_BY']);
+                    $decision_by_fullname = '';
+                    
+                    if(!empty($decision_by)){
+                        $decision_by_details = $api->get_data_details_one_parameter('employee profile', $decision_by);
+                        $decision_by_first_name = $decision_by_details[0]['FIRST_NAME'];
+                        $decision_by_last_name = $decision_by_details[0]['LAST_NAME'];
+                        $decision_by_middle_name = $decision_by_details[0]['MIDDLE_NAME'];
+                        $decision_by_suffix = $decision_by_details[0]['SUFFIX'];
+                        $decision_by_fullname = $api->get_full_name($decision_by_first_name, $decision_by_middle_name, $decision_by_last_name, $decision_by_suffix)[0]['REVERSE_FULL_NAME'];
+                    }
+                    
+                    // Calculate duration between start and end time
+                    $start_datetime = new DateTime(trim($row['START_TIME']));
+                    $end_datetime = new DateTime(trim($row['END_TIME']));
+                    $interval = $end_datetime->diff($start_datetime);
+                    
+                    // Format the total hours and minutes for human-readable display
+                    $total_hours = $interval->h + ($interval->days * 24);
+                    $total_minutes = $interval->i;
+                    
+                    // Create the formatted duration string
+                    $duration = '';
+                    if ($total_hours > 0) {
+                        $duration .= $total_hours . ' hour' . ($total_hours != 1 ? 's' : '');
+                    }
+                    if ($total_minutes > 0) {
+                        if ($duration != '') {
+                            $duration .= ' ';
+                        }
+                        $duration .= $total_minutes . ' minute' . ($total_minutes != 1 ? 's' : '');
+                    }
+                    
+                    if ($duration == '') {
+                        $duration = 'Less than a minute';
+                    }
+                    
+                    // Calculate decimal hours for payroll purposes
+                    $decimal_hours = $total_hours + ($total_minutes / 60);
+                    $formatted_decimal_hours = number_format($decimal_hours, 2);
+
+                    $response[] = array(
+                        'OVERTIME_ID' => $overtime_id,
+                        'TITLE' => $title,
+                        'OVERTIME_DATE' => $overtime_date,
+                        'OVERTIME_TIME' => $start_time . ' - ' . $end_time . ' <b>(' . $duration . ')</b>',
+                        'DECIMAL_HOURS' => $formatted_decimal_hours,
+                        'HOLIDAY_TYPE' => $holiday_type,
+                        'STATUS' => $overtime_status,
+                        'DECISION_BY' => $decision_by_fullname,
+                        'DECISION_DATE' => $decision_date . ($decision_time ? '<br/>' . $decision_time : ''),
+                        'REJECTION_REASON' => $rejection_reason,
+                        'CANCELLATION_REASON' => $cancellation_reason
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
     }
+}
+
     
     
      else if($type == 'overtime recommendation table'){
