@@ -2768,6 +2768,7 @@ function generate_element(elementtype, value, container, modal, username){
                   if($('#overtime-summary-datatable').length){
                     generate_datatable_three_parameter('overtime summary table', employeeid, startdate, enddate, '#overtime-summary-datatable', 0, 'desc', '');
                 }
+                
 
                 if($('#attendance-summary-attendance-adjustment-datatable').length){
                     generate_datatable_three_parameter('attendance summary attendance adjustment table', employeeid, startdate, enddate, '#attendance-summary-attendance-adjustment-datatable', 0, 'desc', '');

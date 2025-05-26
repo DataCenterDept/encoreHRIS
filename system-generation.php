@@ -7367,8 +7367,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $department = $department_details[0]['DEPARTMENT'] ?? null;
 
                         $get_working_days = $api->get_working_days($employee_id, $filter_start_date, $filter_end_date);
-                        $get_days_worked = $api->get_days_worked($employee_id, $filter_start_date, $filter_end_date);
-                        $get_total_late = $api->get_total_late($employee_id, $filter_start_date, $filter_end_date);
+                        $get_days_worked = $api->get_days_worked($employee_id, $filter_start_date, $filter_end_date);                        $get_total_late = $api->get_total_late($employee_id, $filter_start_date, $filter_end_date);
                         $get_total_late_minutes = $api->get_total_late_minutes($employee_id, $filter_start_date, $filter_end_date);
                         $get_total_early_leaving = $api->get_total_early_leaving($employee_id, $filter_start_date, $filter_end_date);
                         $get_total_early_leaving_minutes = $api->get_total_early_leaving_minutes($employee_id, $filter_start_date, $filter_end_date);
@@ -7377,8 +7376,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $get_leave_without_pay_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP3', '1');
                         $get_maternity_leave_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP6', '1');
                         $get_paternity_leave_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP7', '1');
-                        $get_ob_paid_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP8', '1');
-                        $get_ob_unpaid_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP9', '1');
+                        $get_ob_paid_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP8', '1');                        $get_ob_unpaid_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP9', '1');
                         $get_emergency_leave_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP5', '1');
                         $get_sick_leave_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP2', '1');
                         $get_mandatory_leave_total = $api->get_leave_total($employee_id, $filter_start_date, $filter_end_date, 'LEAVETP10', '1');
@@ -7387,7 +7385,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             'FULL_NAME' => '<a href="javascript: void(0);" class="view-attendance-record" data-employeeid="'. $employee_id .'" data-startdate="'. $filter_start_date .'" data-enddate="'. $filter_end_date .'">' . $employee_fullname . '</a>',
                             'DEPARTMENT' => $department,
                             'WORKING_DAYS' => $get_working_days,
-                            'DAYS_WORKED' => $get_days_worked,
+                            'DAYS_WORKED' => $get_days_worked + $get_ob_paid_total,
                             'NUM_LATE' => $get_total_late,
                             'LATE' => number_format($get_total_late_minutes, 2),
                             'NUM_UNDERTIME' => $get_total_early_leaving,
@@ -7397,7 +7395,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             'LEAVE_WITHOUT_PAY' => $get_leave_without_pay_total,
                             'MATERNITY_LEAVE' => $get_maternity_leave_total,
                             'PATERNITY_LEAVE' => $get_paternity_leave_total,
-                            'OFFICIAL_BUSINESS_PAID' => $get_ob_paid_total,
+                          'OFFICIAL_BUSINESS_PAID' => $get_ob_paid_total,
                             'OFFICIAL_BUSINESS_UNPAID' => $get_ob_unpaid_total,
                             'EMERGENCY_LEAVE' => $get_emergency_leave_total,
                             'SICK_LEAVE' => $get_sick_leave_total,
